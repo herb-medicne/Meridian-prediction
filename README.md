@@ -27,7 +27,7 @@ There are five parameters needed when running the scrip.
     •	5 = ‘Ext’
     •	6 = ‘ADME+Ext’
     •	7 = ‘all the Four kind of Fingerprint’
-    •	8 = ‘ADME + all Fingerprints’
+    •	8 = ‘ADME and all Fingerprints’
     
 ### 1.3	‘o’ (Meridian)
 
@@ -45,7 +45,7 @@ There are five parameters needed when running the scrip.
 
     •	Compound_meridian_features.csv
     •	herb_level_after_filteration.csv
-    •	herb_level_without _filteration.csv
+    •	herb_level_without_filteration.csv
 
 ## 2.	Compound_meridian_features.csv
 
@@ -57,7 +57,7 @@ This is herb level of Meridian classification and features. The feature are calc
 
 ## 4.	herb_level_without _filteration.csv
 
-This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds together nomatter it is ggod properties or not.
+This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds together nomatter it is with good properties or not.
 
 # Example
 
