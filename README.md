@@ -11,14 +11,14 @@ Here, we share the ML code. It mainly include one script and three original data
 
 There are five parameters needed when running the scrip. 
 
-#### 1.1 ‘m’ (Machining learning method)
+#### 1.1 ‘m’ ( Machining learning method )
 
     •	1 = 'knn'
     •	2 = 'rf'
-    •	3 =  "svmLinear"
+    •	3 = 'svmLinear'
     •	4 = ‘rpart’
     
-#### 1.2 ‘d’ (Features we use)
+#### 1.2 ‘d’ ( Features we use )
 
     •	1 = ‘ADMET’
     •	2 = ‘Pubchem’
@@ -29,7 +29,7 @@ There are five parameters needed when running the scrip.
     •	7 = ‘all the Four kind of Fingerprint’
     •	8 = ‘ADME and all Fingerprints’
     
-#### 1.3 ‘o’ (Meridian)
+#### 1.3 ‘o’ ( Meridian )
 
     •	1 = ‘Lung’
     •	2 = ‘Spleen’
