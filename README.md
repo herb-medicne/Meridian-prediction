@@ -29,7 +29,7 @@ There are five parameters needed when running the scrip.
     •	7 = ‘all the Four kind of Fingerprint’
     •	8 = ‘ADME and all Fingerprints’
     
-### 1.3	‘o’ (Meridian)
+#### 1.3 ‘o’ (Meridian)
 
     •	1 = ‘Lung’
     •	2 = ‘Spleen’
@@ -39,23 +39,23 @@ There are five parameters needed when running the scrip.
     •	6 = ‘Larger Intestine’ 
     •	7 = ‘Liver’
     
-### 1.4	‘f’ ( Output file name for the model evaluation)
+#### 1.4 ‘f’ ( Output file name for the model evaluation )
 
-### 1.5	‘i’ (Input file name )
+#### 1.5 ‘i’ ( Input file name )
 
     •	Compound_meridian_features.csv
     •	herb_level_after_filteration.csv
     •	herb_level_without_filteration.csv
 
-## 2.	Compound_meridian_features.csv
+## 2. Compound_meridian_features.csv
 
 This is compound level of Meridian classification and features. Here, as the file is too big, we have compressed it to Compound_meridian_features.7z file. You can uncompree it to Compound_meridian_features.csv.
 
-## 3.	herb_level_after_filteration.csv
+## 3. herb_level_after_filteration.csv
 
 This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds with good properties together.
 
-## 4.	herb_level_without _filteration.csv
+## 4. herb_level_without _filteration.csv
 
 This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds together nomatter it is with good properties or not.
 
