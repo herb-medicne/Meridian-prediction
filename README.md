@@ -13,9 +13,9 @@ There are five parameters needed when running the scrip.
 
 #### 1.1 ‘m’ (Machining learning method)
 
-    •	1 = 'knn'&
-    •	2 = 'rf'&
-    •	3=  "svmLinear"
+    •	1 = 'knn'
+    •	2 = 'rf'
+    •	3 =  "svmLinear"
     •	4 = ‘rpart’
     
 #### 1.2 ‘d’ (Features we use)
@@ -25,9 +25,9 @@ There are five parameters needed when running the scrip.
     •	3 = ‘MACCS’
     •	4 = ‘Sub’
     •	5 = ‘Ext’
-    •	6 =’ADME+ Ext’
+    •	6 = ‘ADME+Ext’
     •	7 = ‘all the Four kind of Fingerprint’
-    •	8 = ’ADME + all Fingerprints’
+    •	8 = ‘ADME + all Fingerprints’
     
 ### 1.3	‘o’ (Meridian)
 
@@ -43,7 +43,7 @@ There are five parameters needed when running the scrip.
 
 ### 1.5	‘i’ (Input file name )
 
-    •	Compound_meridian_features.csv (Here, as the file is too big, we have compressed it to Compound_meridian_features.7z file)
+    •	Compound_meridian_features.csv
     •	herb_level_after_filteration.csv
     •	herb_level_without _filteration.csv
 
@@ -67,7 +67,7 @@ For example, we give the value of the five parameters:
     •	d=6
     •	o=1
     •	f='knn_admeExt_Lung.csv'
-    •	i = ‘herb_level_after_filteration.csv’
+    •	i=‘herb_level_after_filteration.csv’
     
 Then run it with your own R script, and give four arguments by $m $d $o $f $i. It means that we want to use KNN as machining learning method, use ADME and  Ext fingerprint combined together as features’ to  predict Meridian lung in herb after_filteration level. Finally, we export the predict evaluation result 'knn_admeExt_Lung.csv'.
 
