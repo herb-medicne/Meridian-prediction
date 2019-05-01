@@ -13,8 +13,6 @@ library(mlbench)
 library('randomForest')
  
 args = commandArgs(trailingOnly=TRUE)
-# this is for test
-#mydata<- read.csv('C:\\Users\\yinyin\\Desktop\\herbpair\\reviewround_1\\647_herb_afteration.csv', header =T,sep=',')
 
 #import data and data preparation
 
@@ -125,7 +123,7 @@ meridian4=function(data,organlist,seedlist,methodlist)
 }
 
 
-##5.1 different feature
+##5.1 different features
 meridian5=function(datalist,organlist,seedlist,methodlist,filename_pre_csv='')
 {
   d1=data.frame()
