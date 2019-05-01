@@ -11,11 +11,10 @@ library(nycflights13)
 library(car)
 library(mlbench)
 library('randomForest')
- 
+
 args = commandArgs(trailingOnly=TRUE)
 
 #import data and data preparation
-
 inputfilename_list = c('Compound_meridian_features.csv', 'herb_level_after_filteration.csv', 'herb_level_without_filteration.csv')
 filename_input_csv=inputfilename_list[as.numeric(args[5])]
 mydata<- read.csv(filename_input_csv, header =T,sep=',')
@@ -96,7 +95,7 @@ meridian2=function(data,organ,seednumber,methodlist)
 }
 
 
-##3.1 differente organs
+##3.1 differente Meridians
 
 meridian3=function(data,organlist,seednumber,methodlist)
 {
