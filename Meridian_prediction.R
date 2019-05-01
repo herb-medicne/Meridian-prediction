@@ -11,12 +11,15 @@ library(nycflights13)
 library(car)
 library(mlbench)
 library('randomForest')
-
+ 
 args = commandArgs(trailingOnly=TRUE)
+# this is for test
+#mydata<- read.csv('C:\\Users\\yinyin\\Desktop\\herbpair\\reviewround_1\\647_herb_afteration.csv', header =T,sep=',')
 
+#import data and data preparation
 
-#import data and data prepare it
-filename_input_csv=args[5]
+inputfilename_list = c('Compound_meridian_features.csv', 'herb_level_after_filteration.csv', 'herb_level_without_filteration.csv')
+filename_input_csv=inputfilename_list[as.numeric(args[5])]
 mydata<- read.csv(filename_input_csv, header =T,sep=',')
 uniquedata2= uniquecombs(mydata)
 uniquedata2[is.na(uniquedata2)] <- 0
@@ -30,6 +33,8 @@ uniquedata2=uniquedata2[,-1]
 #training the model 
 meridian1=function(data,organ,seednumber,methods)
 {
+  datanames= names(data)
+  data = as.data.frame(data)
   set.seed(seednumber)
   intrain = createDataPartition(y = organ[,1], p= 0.7, list = FALSE)
   training = data[intrain,]
@@ -47,7 +52,7 @@ meridian1=function(data,organ,seednumber,methods)
   model_fit <- train (training, trainingclass, method = methods,trControl=trctrl, preProcess = c("center", "scale"),tuneLength = 10)
  model_fit
   parametertest=model_fit$result
-  filename_paragrid=paste(names(organ),methods,'para.csv',sep='_')
+  filename_paragrid=paste(names(organ),datanames,methods,'para.csv',sep='_')
   write.csv(parametertest,file= filename_paragrid)
   #Plot fit
   #filename_para=paste(names(organ),methods,'.png',sep='_')
@@ -60,20 +65,20 @@ meridian1=function(data,organ,seednumber,methods)
   # summarize importance
   #print(importance)
   # plot importance
-  filename_import_csv=paste(names(organ),methods,'import.csv',sep='_')
+  filename_import_csv=paste(names(organ),datanames,methods,'import.csv',sep='_')
   write.csv(importance$importance,file=filename_import_csv)
-  filename_import_png=paste(names(organ),methods,'import.png',sep='_')
+  filename_import_png=paste(names(organ),methods,datanames,'import.png',sep='_')
   #png(filename=filename_import_png)
   #plot(importance,top=10)
   #dev.off()
   
   
-  # KNN for Liver
+  # predict the testing data
  
  modelPredict = predict(model_fit, newdata = testing)
   a=confusionMatrix(modelPredict,testingclass,positive='1')
   tocsv = data.frame(cbind(t(a$overall),t(a$byClass)))
-  k=c(seednumber,deparse(substitute(data)),methods,names(organ))
+  k=c(seednumber,datanames,methods,names(organ))
   names(k)=c('seed','data','method','organ')
   tocsv1=data.frame(cbind(t(k),tocsv))
   return(tocsv1)
@@ -124,23 +129,26 @@ meridian4=function(data,organlist,seedlist,methodlist)
 meridian5=function(datalist,organlist,seedlist,methodlist,filename_pre_csv='')
 {
   d1=data.frame()
-  for(datas in datalist)
+  for(i in 1:length(datalist))
   {
-    d=meridian4(datas,organlist,seedlist,methodlist)
+    datas = datalist[i]
+    names(datas)= names(datalist[i])
+	  d=meridian4(datas,organlist,seedlist,methodlist)
     d1= data.frame(rbind(d1, d))
   }
   write.csv(d1,file=filename_pre_csv)
   return(d1)
 }
 
-ADMET=scale(select(uniquedata2,MW:SyntheticAccessibility))
+ADMET=select(uniquedata2,MW:SyntheticAccessibility)
+ADMET = ADMET %>% mutate_at(colnames(ADMET),funs(c(scale(.))))
 Pubchem= select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'PubchemFP')])
 MACCS= select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'MACCSFP')])
 Sub = select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'SubFP')])
 Ext=select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'ExtFP')])
-ADMEText=scale(select(uniquedata2,MW:ExtFP1021))
-FourFinger=scale(select(uniquedata2,ExtFP1:MACCSFP165))
-ADMETFinger=scale(select(uniquedata2,MW:MACCSFP165))
+ADMEText=select(uniquedata2,MW:ExtFP1021)
+FourFinger=select(uniquedata2,ExtFP1:MACCSFP165)
+ADMETFinger=select(uniquedata2,MW:MACCSFP165)
 allorgan=select(uniquedata2,Lung:Liver)
 
 Liver=as.data.frame(uniquedata2$Liver)
@@ -166,13 +174,13 @@ names(Stomach)='Stomach'
 Stomach[Stomach>1]='1'
 
 
-datalistall=list(ADMET,Pubchem,MACCS,Sub,Ext,ADMEText,FourFinger,ADMETFinger)
+datalistall=list(ADMET = as.data.frame(ADMET),Pubchem = as.data.frame(Pubchem),MACCS = as.data.frame(MACCS),Sub = (Sub),Ext = as.data.frame(Ext) ,ADMEText = as.data.frame( ADMEText), FourFinger = as.data.frame(FourFinger),ADMETFinger = as.data.frame(ADMETFinger))
 methodlistall=c('knn','rf', 'svmLinear','rpart')
 organlistall=list(Lung,Spleen,Stomach,Heart,Kidney,LargeIntestine,Liver)
-methodlist=methodlistall[as.numeric(args[1])]
-datalist=datalistall[as.numeric(args[2])]
+methodlist=methodlistall[as.vector(eval(parse(text=args[1])))]
+datalist=datalistall[as.vector(eval(parse(text=args[2])))]
 seedlist=c(3333)
-organlist=organlistall[as.numeric(args[3])]
+organlist=organlistall[as.vector(eval(parse(text=args[3])))]
 filename_pre_csv=args[4]
 
 meridian5(datalist,organlist,seedlist,methodlist,filename_pre_csv)
