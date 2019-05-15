@@ -26,36 +26,35 @@ There are five parameters needed when running the scrip.
     •	4 = ‘Sub’
     •	5 = ‘Ext’
     •	6 = ‘ADME+Ext’
-    •	7 = ‘all the four kinds of Fingerprint’
-    •	8 = ‘ADME and all Fingerprints’
+    •	7 = ‘ADME and all Fingerprints’
     
 #### 1.3 ‘o’ ( Meridian )
 
-    •	1 = ‘Lung’
-    •	2 = ‘Spleen’
-    •	3 = ‘Stomach’
-    •	4 = ‘Heart’
-    •	5 = ‘Kidney’
-    •	6 = ‘Larger Intestine’ 
-    •	7 = ‘Liver’
+    •	1 = ‘LUNG’
+    •	2 = ‘SPLEEN’
+    •	3 = ‘STOMACH’
+    •	4 = ‘HEART’
+    •	5 = ‘KIDNEY’
+    •	6 = ‘LARGE INTESTINE’ 
+    •	7 = ‘LIVER’
     
 #### 1.4 ‘f’ ( Output file name for the model evaluation )
 
 #### 1.5 ‘i’ ( Input file name )
 
-    •	1 = 'Compound_meridian_features.csv'
-    •	2 = 'herb_level_after_filteration.csv'
-    •	3 = 'herb_level_without_filteration.csv'
+    •	1 = 'herb_feature.csv'
+    •	2 = 'herb_feature_adme_filter.csv'
+    •	3 = 'compound_feature.csv'
 
-## 2. Compound_meridian_features.csv
+## 2. compound_feature.csv
 
-This is compound level of Meridian classification and features. Here, as the file is too big, we have compressed it to Compound_meridian_features.7z file. You can uncompree it to Compound_meridian_features.csv.
+This is compound level of Meridian classification and features. Here, as the file is too big, we have compressed it to compound_feature.7z file. You can uncompree it to Compound_meridian_features.csv.
 
-## 3. herb_level_after_filteration.csv
+## 3. herb_feature_adme_filter.csv
 
 This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds with good properties together.
 
-## 4. herb_level_without _filteration.csv
+## 4. herb_feature.csv
 
 This is herb level of Meridian classification and features. The feature are calculated by adding all related compounds together nomatter it is with good properties or not.
 
@@ -67,7 +66,7 @@ For example, we give the value of the five parameters:
     •	d='c(1,2)'
     •	o='c(3,4)'
     •	f='knn_admeExt_Lung.csv'
-    •	i=3
+    •	i=1
     
 Then run it with your own R script, and give four arguments by $m $d $o $f $i. It means that we want to use kNN and SVM as machining learning methods, use ADME and PuChem as features to  predict Meridian Heart and Stomach in herb before_filteration level. Finally, we export the predict evaluation result 'knn_svm_ADME_PubChem_Stomach_Heart.csv'.
 
