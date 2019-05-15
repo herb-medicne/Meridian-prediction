@@ -1,9 +1,14 @@
 This is the python code how we prepare the data for model predict (the herb meridian matrix, 
 herb feature matrix and compound meridian matrix).
 The basic files we use including:
-A. herb basic information----'herb_basic_information.csv'
-B. compound basic inforamtion----'compound_basic_information.csv'
-C. compound feature----'compound_feature.csv'
-(ADME feature are calculted by SwissADME:http://www.swissadme.ch/index.php#top fingerprint are calulated 
-by Padel description: http://www.yapcwsoft.com/dd/padeldescriptor/).  
-D. herb compound pairs----'compound_herb_pair.csv'
+
+#### A. herb basic information----'herb_basic_information.csv'
+
+#### B. compound basic inforamtion----'compound_basic_information.csv'
+
+#### C. compound feature----'compound_feature.csv'
+
+ADME feature are calculted by SwissADME (http://www.swissadme.ch/index.php#top). Fingerprint are calulated 
+by Padel description (http://www.yapcwsoft.com/dd/padeldescriptor/). 
+
+#### D. herb compound pairs----'compound_herb_pair.csv'
