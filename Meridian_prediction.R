@@ -15,17 +15,17 @@ library('randomForest')
 args = commandArgs(trailingOnly=TRUE)
 
 #import data and data preparation
-inputfilename_list = c('Compound_meridian_features.csv', 'herb_level_after_filteration.csv', 'herb_level_without_filteration.csv')
-filename_input_csv=inputfilename_list[as.numeric(args[5])]
-mydata<- read.csv(filename_input_csv, header =T,sep=',')
+
+inputfilename_list = c('herb_feature.csv', 'herb_feature_adme_filter.csv', 'compound_feature.csv')
+
+filename = inputfilename_list[as.numeric(args[5])]
+mydata = read.csv(filename)
+rownames(mydata)=mydata[,1]
+mydata = select(mydata,'LUNG':'SubFP307')
 uniquedata2= uniquecombs(mydata)
 uniquedata2[is.na(uniquedata2)] <- 0
-#delete whose feature that all compounds is 'NA' 
 a=colSums(uniquedata2)
-combin <- data.frame(rbind(t(data.frame(a)),data.frame(uniquedata2)))
-uniquedata2=combin[,which(a!=0)][-1,]
-rownames(uniquedata2)=uniquedata2[,1]
-uniquedata2=uniquedata2[,-1]
+uniquedata2=uniquedata2[,which(a!=0)]
 
 #training the model 
 meridian1=function(data,organ,seednumber,methods)
@@ -42,15 +42,14 @@ meridian1=function(data,organ,seednumber,methods)
   testingclass=databin[-intrain,][,1]
   testingclass=factor(testingclass)
   
-  
   # train model
   set.seed(3333)
   trctrl <- trainControl(method = "cv", number = 5)
-  model_fit <- train (training, trainingclass, method = methods,trControl=trctrl, preProcess = c("center", "scale"),tuneLength = 10)
- model_fit
-  parametertest=model_fit$result
-  filename_paragrid=paste(names(organ),datanames,methods,'para.csv',sep='_')
-  write.csv(parametertest,file= filename_paragrid)
+  model_fit <- train (training, trainingclass, method = methods, trControl=trctrl, metric = 'Accuracy')
+  model_fit
+  #parametertest=model_fit$result
+  #filename_paragrid=paste(names(organ),datanames,methods,'para.csv',sep='_')
+  #write.csv(parametertest,file= filename_paragrid)
   #Plot fit
   #filename_para=paste(names(organ),methods,'.png',sep='_')
   #png(filename_para)
@@ -60,11 +59,10 @@ meridian1=function(data,organ,seednumber,methods)
   ##SELELCT FEATURE
   importance <- varImp(model_fit, scale=FALSE)
   # summarize importance
-  #print(importance)
   # plot importance
   filename_import_csv=paste(names(organ),datanames,methods,'import.csv',sep='_')
   write.csv(importance$importance,file=filename_import_csv)
-  filename_import_png=paste(names(organ),methods,datanames,'import.png',sep='_')
+  #filename_import_png=paste(names(organ),methods,datanames,'import.png',sep='_')
   #png(filename=filename_import_png)
   #plot(importance,top=10)
   #dev.off()
@@ -73,16 +71,17 @@ meridian1=function(data,organ,seednumber,methods)
   # predict the testing data
  
  modelPredict = predict(model_fit, newdata = testing)
+  #a=confusionMatrix(modelPredict,testingclass,positive='one')
   a=confusionMatrix(modelPredict,testingclass,positive='1')
   tocsv = data.frame(cbind(t(a$overall),t(a$byClass)))
   k=c(seednumber,datanames,methods,names(organ))
-  names(k)=c('seed','data','method','organ')
+  names(k)=c('seed','Feature_type','Method','Meridians')
   tocsv1=data.frame(cbind(t(k),tocsv))
   return(tocsv1)
 }
 
 
-###2.1 differente methods
+###2.1 different methods
 meridian2=function(data,organ,seednumber,methodlist)
 {
   m1=data.frame()
@@ -95,7 +94,7 @@ meridian2=function(data,organ,seednumber,methodlist)
 }
 
 
-##3.1 differente Meridians
+##3.1 different organs
 
 meridian3=function(data,organlist,seednumber,methodlist)
 {
@@ -122,7 +121,7 @@ meridian4=function(data,organlist,seedlist,methodlist)
 }
 
 
-##5.1 different features
+##5.1 different feature
 meridian5=function(datalist,organlist,seedlist,methodlist,filename_pre_csv='')
 {
   d1=data.frame()
@@ -137,47 +136,54 @@ meridian5=function(datalist,organlist,seedlist,methodlist,filename_pre_csv='')
   return(d1)
 }
 
-ADMET=select(uniquedata2,MW:SyntheticAccessibility)
-ADMET = ADMET %>% mutate_at(colnames(ADMET),funs(c(scale(.))))
-Pubchem= select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'PubchemFP')])
+col_scale = colnames(select(uniquedata2,'MW':'Synthetic.Accessibility'))
+uniquedata2 = uniquedata2 %>% mutate_at(col_scale,funs(c(scale(.))))
+ADME=select(uniquedata2,MW:Synthetic.Accessibility)
+PubChem= select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'PubchemFP')])
 MACCS= select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'MACCSFP')])
 Sub = select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'SubFP')])
 Ext=select(uniquedata2,colnames(uniquedata2)[startsWith(colnames(uniquedata2),'ExtFP')])
-ADMEText=select(uniquedata2,MW:ExtFP1021)
-FourFinger=select(uniquedata2,ExtFP1:MACCSFP165)
-ADMETFinger=select(uniquedata2,MW:MACCSFP165)
-allorgan=select(uniquedata2,Lung:Liver)
+ADME_Ext=select(uniquedata2,MW:ExtFP1021)
+ADME_Ext=cbind(ADME,Ext)
+FourFinger=cbind(PubChem,MACCS,Sub,Ext)
+ADME_all=cbind(ADME,FourFinger)
 
-Liver=as.data.frame(uniquedata2$Liver)
-Liver[Liver>1]='1'
-names(Liver)='Liver'
-Spleen=as.data.frame(uniquedata2$Spleen)
-Spleen[Spleen>1]='1'
-names(Spleen)='Spleen'
-Lung=as.data.frame(uniquedata2$Lung)
-names(Lung)='Lung'
-Lung[Lung>1]='1'
-Heart=as.data.frame(uniquedata2$Heart)
-names(Heart)='Heart'
-Heart[Heart>1]='1'
-Kidney=as.data.frame(uniquedata2$Kidney)
-names(Kidney)='Kidney'
-Kidney[Kidney>1]='1'
-LargeIntestine=as.data.frame(uniquedata2$LargeIntestine)
-names(LargeIntestine)='LargeIntestine'
-LargeIntestine[LargeIntestine>1]='1'
-Stomach=as.data.frame(uniquedata2$Stomach)
-names(Stomach)='Stomach'
-Stomach[Stomach>1]='1'
+LIVER=as.data.frame(uniquedata2$LIVER)
+LIVER[LIVER>1]='1'
+names(LIVER)='LIVER'
+SPLEEN=as.data.frame(uniquedata2$SPLEEN)
+SPLEEN[SPLEEN>1]='1'
+names(SPLEEN)='SPLEEN'
+LUNG=as.data.frame(uniquedata2$LUNG)
+names(LUNG)='LUNG'
+LUNG[LUNG>1]='1'
+HEART=as.data.frame(uniquedata2$HEART)
+names(HEART)='HEART'
+HEART[HEART>1]='1'
+KIDNEY=as.data.frame(uniquedata2$KIDNEY)
+names(KIDNEY)='KIDNEY'
+KIDNEY[KIDNEY>1]='1'
+LARGE.INTESTINE=as.data.frame(uniquedata2$LARGE.INTESTINE)
+names(LARGE.INTESTINE)='LARGE.INTESTINE'
+LARGE.INTESTINE[LARGE.INTESTINE>1]='1'
+STOMACH=as.data.frame(uniquedata2$STOMACH)
+names(STOMACH)='STOMACH'
+STOMACH[STOMACH>1]='1'
 
 
-datalistall=list(ADMET = as.data.frame(ADMET),Pubchem = as.data.frame(Pubchem),MACCS = as.data.frame(MACCS),Sub = (Sub),Ext = as.data.frame(Ext) ,ADMEText = as.data.frame( ADMEText), FourFinger = as.data.frame(FourFinger),ADMETFinger = as.data.frame(ADMETFinger))
+datalistall=list(ADME = as.data.frame(ADME),PubChem = as.data.frame(PubChem),MACCS = as.data.frame(MACCS),Sub = (Sub),Ext = as.data.frame(Ext) ,ADME_Ext = as.data.frame( ADME_Ext), ADME_all = as.data.frame(ADME_all))
 methodlistall=c('knn','rf', 'svmLinear','rpart')
-organlistall=list(Lung,Spleen,Stomach,Heart,Kidney,LargeIntestine,Liver)
+organlistall=list(LUNG,SPLEEN,STOMACH,HEART,KIDNEY,LARGE.INTESTINE,LIVER)
 methodlist=methodlistall[as.vector(eval(parse(text=args[1])))]
+#methodlist=methodlistall
+#methodlist=methodlistall[as.numeric(args[2])]
 datalist=datalistall[as.vector(eval(parse(text=args[2])))]
+#datalist=datalistall
+#datalist=datalistall[as.numeric(args[3])]
 seedlist=c(3333)
 organlist=organlistall[as.vector(eval(parse(text=args[3])))]
+#organlist=organlistall[as.numeric(args[3])]
 filename_pre_csv=args[4]
 
-meridian5(datalist,organlist,seedlist,methodlist,filename_pre_csv)
+#meridian5(datalist,organlist,seedlist,methodlist,filename_pre_csv)
+
