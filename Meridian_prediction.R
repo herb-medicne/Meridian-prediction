@@ -185,5 +185,5 @@ organlist=organlistall[as.vector(eval(parse(text=args[3])))]
 #organlist=organlistall[as.numeric(args[3])]
 filename_pre_csv=args[4]
 
-#meridian5(datalist,organlist,seedlist,methodlist,filename_pre_csv)
+meridian5(datalist,organlist,seedlist,methodlist,filename_pre_csv)
 
