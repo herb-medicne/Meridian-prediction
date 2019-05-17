@@ -18,19 +18,18 @@ os.getcwd()
 
 #1. read data
 
-# compound_basic_infor
+# compound basic information
 data_compound_basic_infor = pd.read_csv('compound_basic_information.csv',encoding="utf-8")
 data_compound_basic_infor.index = data_compound_basic_infor['Ingredientid']
 
 # herb baisc information
-pd_meridians_with = pd.read_csv('compound_herb_pair.csv',encoding="utf-8")
+pd_meridians_with = pd.read_csv('cherb_basic_information.csv',encoding="utf-8")
 
 #herb compound pair
 herb_ingredient_pair = pd.read_csv('compound_herb_pair.csv',encoding="utf-8")
 
-#compound feature
-import compound_feature
-compound_features_all = pd.read_csv('compound_feature.csv')
+#compound feature basic information
+compound_features_all = pd.read_csv('compound_feature_baisc.csv')
 compound_features_all.index = compound_features_all['Ingredientid']
 
 #2. generate herb meridian matrix
@@ -52,13 +51,11 @@ com_data_datframe_all_more,com_related_more,herb_related_more = herb_pair.find_r
 com_data_datframe_all.to_csv('Herb_Compound.csv')
 
 #4. generate herb feature matrix
-
-#pd_herb_feature_sum_sorted = herb_pair.fill__herb_features(herb_meridian_class,feature_names,herb_ingredient_pair,
-                                                    #compound_features_all, average_it = False,sort_herb =True)
+import compound_feature
 pd_herb_feature_average_sorted = herb_pair.fill__herb_features(herb_meridian_class,feature_names,herb_ingredient_pair,
                                                     compound_features_all, average_it = True,sort_herb =True)
 
-pd_herb_feature_average_sorted.to_csv('herb_feature.csv',encoding="utf-8")
+pd_herb_feature_average_sorted.to_csv('herb_feature.csv',encoding = "utf-8")
 
 #5. generate compound meridian matrix
 
@@ -70,7 +67,7 @@ compound_features_related = compound_features_all.loc[common_com_list]
 
 pd_compound_class_sum_sorted = herb_pair.fill_compound_class(compound_features_related,class_names,herb_ingredient_pair,
                                                       pd_herb_meridian_dict,feature_names,average_it = False,sort_com = False)
-pd_compound_class_sum_sorted.to_csv('compound_meridian.csv')
+pd_compound_class_sum_sorted.to_csv('compound_feature.csv')
 
 #6. generate herb feature by filtering compound
 compound_features_filtered =  compound_feature.compound_filter_by_property(compound_features_all)
