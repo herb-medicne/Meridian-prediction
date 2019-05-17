@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 9.5.2019 13.59
-# @Author  : YINYIN
-# @Site    : 
 # @File    : compound_feature.py
 # @Software: PyCharm
 
