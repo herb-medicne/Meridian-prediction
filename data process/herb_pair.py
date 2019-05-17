@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 9.5.2019 13.28
-# @Author  : YINYIN
-# @Site    : 
 # @File    : herb_pair.py
 # @Software: PyCharm
 
