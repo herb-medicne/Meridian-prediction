@@ -52,10 +52,11 @@ com_data_datframe_all_more, com_related_more, herb_related_more = herb_pair.find
 com_data_datframe_all.to_csv('Herb_Compound.csv')
 
 # 4. generate herb feature matrix
+
 import compound_feature
 
 pd_herb_feature_average_sorted = herb_pair.fill__herb_features(herb_meridian_class, feature_names, herb_ingredient_pair,
-                                                               compound_features_all, average_it=True, sort_herb=True)
+                                                               compound_features_all, average_it=True)
 
 pd_herb_feature_average_sorted.to_csv('herb_feature.csv', encoding="utf-8")
 
@@ -69,17 +70,16 @@ compound_features_related = compound_features_all.loc[common_com_list]
 
 pd_compound_class_sum_sorted = herb_pair.fill_compound_class(compound_features_related, class_names,
                                                              herb_ingredient_pair,
-                                                             pd_herb_meridian_dict, feature_names, average_it=False,
-                                                             sort_com=False)
+                                                             pd_herb_meridian_dict, feature_names, average_it=False)
 pd_compound_class_sum_sorted.to_csv('compound_feature.csv')
 
 # 6. generate herb feature by filtering compound
+
 compound_features_filtered = compound_feature.compound_filter_by_property(compound_features_all)
 
 pd_herb_feature_average_filter_sorted = herb_pair.fill__herb_features(herb_meridian_class, feature_names,
                                                                       herb_ingredient_pair,
-                                                                      compound_features_filtered, average_it=True,
-                                                                      sort_herb=True)
+                                                                      compound_features_filtered, average_it=True)
 
 pd_herb_feature_average_filter_sorted.to_csv('herb_feature_filter_.csv', encoding="utf-8")
 
