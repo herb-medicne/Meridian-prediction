@@ -3,7 +3,7 @@
 This is for Meridian (Traditional Chinese Medicine conception) prediction by machining learning method.
 Plant-derived nature products, known as herb formulas, have been commonly used in Traditional Chinese Medicine (TCM) for disease prevention and treatment. The herbs have been traditionally classified into different categories according to their targeting organs known as Meridians. Despite the increasing knowledge on the active components of the herbs, the rationale of Meridian classification remains poorly understood. In this study, we took a machine learning approach to explore the molecular basis of Meridian. We determined the molecule features for 646 herbs and their active components including fingerprints and ADME properties (absorption, distribution, metabolism and excretion).
 
-We extracted TCM Meridian and chemical components from the newly published database TCMID (http://119.3.41.228/tcmid/ingredient/41001/).Finally, 18140 herb-compound pairs were collected, including 646 herbs and 10053 compounds.  We used the PaDEL-Descriptor software to calculated compound fingerprints. Compounds ADME properties were obtained from database SwissADME (http://www.swissadme.ch/index.php#top), which provides physicochemical properties, pharmacokinetics, drug-likeness and medicinal chemistry friendliness of compounds. 
+We extracted TCM Meridian and chemical components from the newly published database TCMID (http://119.3.41.228/tcmid/ingredient/41001/). Finally, 18140 herb-compound pairs were collected, including 646 herbs and 10053 compounds. PaDEL-Descriptor software was used to calculate compound fingerprints. Compounds ADME properties were obtained from database SwissADME (http://www.swissadme.ch/index.php#top), which provides physicochemical properties, pharmacokinetics, drug-likeness and medicinal chemistry friendliness of compounds. 
 
 This is how the machining learning model works. It mainly includes one script and three original dataset files, including Meridian_prediction.R, compound_feature.csv, herb_feature.csv and herb_feature_adme_filter.csv. The details about dataset preparation can be found in folder 'data process' above.
 
@@ -74,5 +74,5 @@ Then run it with your own R script, and give five arguments by the order of  $m 
 
 In R teminal, we run like, 
 
- Rscript meridian_predict_new.R $m $d $o $f $i
+Rscript meridian_predict_new.R $m $d $o $f $i
 
