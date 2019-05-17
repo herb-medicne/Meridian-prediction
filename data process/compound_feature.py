@@ -72,11 +72,7 @@ def class_label_ingredient(pd_compound_class_sum_sorted_filter,class_name_one):
     pd_compound_class_sum_sorted_filter.insert(0,class_name_one_new,add_column_list)
     return pd_compound_class_sum_sorted_filter
 
-#list_lung = class_label_ingredient(pd_compound_class_sum_sorted_filter,class_name_one)
-
 def class_label_ingredient_all(pd_compound_class_sum_sorted_filter,class_names):
     for class_name_one in class_names:
         pd_compound_class_sum_sorted_filter = class_label_ingredient(pd_compound_class_sum_sorted_filter, class_name_one)
     return pd_compound_class_sum_sorted_filter
-
-#TODO: def class_label_herb_all()
