@@ -29,7 +29,7 @@ pd_meridians_with = pd.read_csv('cherb_basic_information.csv',encoding="utf-8")
 herb_ingredient_pair = pd.read_csv('compound_herb_pair.csv',encoding="utf-8")
 
 #compound feature basic information
-compound_features_all = pd.read_csv('compound_feature_baisc.csv')
+compound_features_all = pd.read_csv('compound_feature_basic.csv')
 compound_features_all.index = compound_features_all['Ingredientid']
 
 #2. generate herb meridian matrix
