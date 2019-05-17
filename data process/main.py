@@ -49,7 +49,7 @@ com_data_datframe_all_more, com_related_more, herb_related_more = herb_pair.find
                                                                                                    data_compound_basic_infor,
                                                                                                    compound_features_all,
                                                                                                    adme_names)
-com_data_datframe_all.to_csv('Herb_Compound.csv')
+com_data_datframe_all_more.to_csv('Herb_Compound.csv')
 
 # 4. generate herb feature matrix
 
