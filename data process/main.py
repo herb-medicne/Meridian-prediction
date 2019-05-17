@@ -55,10 +55,10 @@ com_data_datframe_all.to_csv('Herb_Compound.csv')
 
 import compound_feature
 
-pd_herb_feature_average_sorted = herb_pair.fill__herb_features(herb_meridian_class, feature_names, herb_ingredient_pair,
+pd_herb_feature_average = herb_pair.fill__herb_features(herb_meridian_class, feature_names, herb_ingredient_pair,
                                                                compound_features_all, average_it=True)
 
-pd_herb_feature_average_sorted.to_csv('herb_feature.csv', encoding="utf-8")
+pd_herb_feature_average.to_csv('herb_feature.csv', encoding="utf-8")
 
 # 5. generate compound meridian matrix
 
@@ -68,18 +68,18 @@ class_names = pd_herb_meridian_dict.columns
 common_com_list = [i for i in compound_features_all.index if i in com_related]
 compound_features_related = compound_features_all.loc[common_com_list]
 
-pd_compound_class_sum_sorted = herb_pair.fill_compound_class(compound_features_related, class_names,
+pd_compound_meridian = herb_pair.fill_compound_class(compound_features_related, class_names,
                                                              herb_ingredient_pair,
                                                              pd_herb_meridian_dict, feature_names, average_it=False)
-pd_compound_class_sum_sorted.to_csv('compound_feature.csv')
+pd_compound_meridian.to_csv('compound_feature.csv')
 
 # 6. generate herb feature by filtering compound
 
 compound_features_filtered = compound_feature.compound_filter_by_property(compound_features_all)
 
-pd_herb_feature_average_filter_sorted = herb_pair.fill__herb_features(herb_meridian_class, feature_names,
+pd_herb_feature_average_filter = herb_pair.fill__herb_features(herb_meridian_class, feature_names,
                                                                       herb_ingredient_pair,
                                                                       compound_features_filtered, average_it=True)
 
-pd_herb_feature_average_filter_sorted.to_csv('herb_feature_filter_.csv', encoding="utf-8")
+pd_herb_feature_average_filter.to_csv('herb_feature_filter_.csv', encoding="utf-8")
 
