@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 15.5.2019 16.08
 # @File    : main.py
 # @Software: PyCharm
 
@@ -11,8 +10,6 @@ import pandas as pd
 import pickle
 import codecs
 from functools import reduce
-
-os.getcwd()
 
 # 1. read data
 
