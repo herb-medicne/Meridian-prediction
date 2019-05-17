@@ -11,8 +11,6 @@ import pickle
 import codecs
 from functools import reduce
 
-
-
 def meridian_feature(pd_meridians, processed=True, herb_list_need=None):
     # when use herb information down load directly from TCMID database, processed is Flase. 
     # Otherwise, if have chose herbs manually,  processed is True.
