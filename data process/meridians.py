@@ -1,8 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# @Time    : 8.5.2019 23.14
-# @Author  : YINYIN
-# @Site    : 
 # @File    : meridians.py
 # @Software: PyCharm
 import os
