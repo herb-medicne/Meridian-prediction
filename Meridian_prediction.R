@@ -21,7 +21,6 @@ inputfilename_list <- c("herb_feature.csv", "herb_feature_adme_filter.csv",
 
 filename <- inputfilename_list[as.numeric(args[5])]
 mydata <- read.csv(filename)
-rownames(mydata) <- mydata[, 1]
 mydata <- select(mydata, "LUNG":"SubFP307")
 uniquedata2 <- uniquecombs(mydata)
 uniquedata2[is.na(uniquedata2)] <- 0
