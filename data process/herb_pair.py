@@ -102,7 +102,7 @@ def find_related_pair_more(herb_ingredient_pair, pd_meridians, data_compound_bas
         if com in compound_features_all['Ingredientid'].tolist() else data_compound_basic_infor.loc[com, :].tolist() +
                                                                       [np.nan] * len(adme_names) for com in
         herb_com_related_pairs_all['Ingredientid'].tolist()]
-
+    
     com_data_datframe_all = pd.DataFrame(com_data_datframe_all, columns=column_all)
     com_data_datframe_all.insert(0, 'herb-id', herb_com_related_pairs_all['herb-id'].tolist())
     com_related = list(set(com_data_datframe_all['Ingredientid'].tolist()))
