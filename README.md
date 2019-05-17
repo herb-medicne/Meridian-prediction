@@ -74,5 +74,5 @@ Then run it with your own R script, and give five arguments by the order of  $m 
 
 In R teminal, we run like, 
 
-Rscript meridian_predict_new.R $m $d $o $f $i
+Rscript Meridian_prediction.R $m $d $o $f $i
 
