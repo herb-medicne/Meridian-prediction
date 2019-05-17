@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 15.5.2019 16.08
-# @Author  : YINYIN
-# @Site    : 
 # @File    : main.py
 # @Software: PyCharm
 
