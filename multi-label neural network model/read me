@@ -1,1 +1,4 @@
 
+we use neural network model with the "sigmoid" activation function of output layer, and the loss evaluation is 
+‘'binary_crossentropy'. This is suitable for multi-label problem 
+(https://www.depends-on-the-definition.com/guide-to-multi-label-classification-with-neural-networks/).
