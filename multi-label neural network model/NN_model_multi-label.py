@@ -20,6 +20,7 @@ from sklearn.metrics import classification_report,accuracy_score,confusion_matri
 import math
 import os
 
+# process the data to train and split
 def get_data(X,y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     scaler = StandardScaler().fit(X_train)
@@ -27,6 +28,7 @@ def get_data(X,y):
     X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
+# read the whole dataset to different kind of feature
 def get_datasets(data):
     y= np.array(data.loc[:,['LUNG','SPLEEN','STOMACH','HEART','KIDNEY','LIVER','LARGE INTESTINE']])
     X_ADME = data.loc[:,'MW':'Synthetic Accessibility']
@@ -47,7 +49,7 @@ def get_datasets(data):
     X_list = [X_ADME, X_Ext, X_Pubchem, X_Sub, X_MACCS, X_ADME_Ext, X]
     return X_list, y
 
-# model
+# model 
 def get_model(X_train,y_train):
     x_shape = len(X_train[1])
     dense_shape = int(math.log(x_shape, 2))
