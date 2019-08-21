@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # @Time    : 14.8.2019 9.58
-# @Author  : YINYIN
-# @Site    : 
 # @File    : deep_learning_test.py
 # @Software: PyCharm
 
