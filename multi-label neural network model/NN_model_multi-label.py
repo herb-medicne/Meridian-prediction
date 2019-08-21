@@ -12,9 +12,6 @@
 
 import glob
 import scipy.misc
-#import matplotlib
-#%matplotlib inline
-#import matplotlib.pyplot as plt
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -28,8 +25,6 @@ from sklearn.metrics import classification_report,accuracy_score,confusion_matri
     precision_score, recall_score, f1_score, cohen_kappa_score,roc_auc_score
 import math
 import os
-os.chdir('C:\\Users\\yinyin\\Desktop\\manscript\\figure\\jing version\\version3\\Table')
-
 
 def get_data(X,y):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -108,12 +103,13 @@ def meridan_result (threshhold,meridian_names,result_data,true_data):
     pd_result.columns = pd_add_column_in
     return pd_result
 
+#use different probality value as the threshhold of positive and negative to binary the predictors
 def filter_result (filter_list,meridian_names,result_data,true_data):
     pd_result = pd.concat(list(map( lambda x: meridan_result(x,meridian_names,result_data,true_data),
                                     filter_list)),keys=filter_list)
     return pd_result
 
-# try different data
+# try different data at three level, herb, herb_adme_filter, compound
 def get_model_result_one(X,y):
     X_train, X_test, y_train, y_test = get_data(np.array(X),y)
     nn = get_model(X_train, y_train)
@@ -121,6 +117,7 @@ def get_model_result_one(X,y):
     all_result = filter_result(filter_list,meridian_names,result,true)
     return all_result
 
+#combine all predict evaluation
 def get_model_result_all(X_list, y):
     pd_result_all = pd.concat(list(map( lambda x: get_model_result_one(x,y),X_list)),
                               keys= [i.name for i in X_list],axis=0,ignore_index=False)
@@ -131,7 +128,16 @@ def model_result_levels(dataset_list):
                                keys=[i.name for i in dataset_list], axis=0,sort=True, ignore_index=True)
     return pd_all_all
 
-# apply on my project
+# read the data for this project and prepare data
+data_herb = pd.read_csv('herb.csv', encoding='utf-8')
+data_herb.name = 'Herb'
+data_herb_filter = pd.read_csv('herb_filter.csv', encoding='utf-8')
+data_herb_filter.name = 'Herb_filter'
+data_compound = pd.read_csv('compound.csv', encoding='utf-8')
+data_compound.name = ['Compound']
+dataset_list = [data_herb,data_herb_filter, data_compound ]
+
+# set the parameters
 meridian_names = ['LUNG','SPLEEN','STOMACH','HEART','KIDNEY','LIVER','LARGE INTESTINE']
 list_of_functions = [confusion_matrix,
                      accuracy_score,
@@ -140,14 +146,5 @@ list_of_functions = [confusion_matrix,
                      recall_score,
                      cohen_kappa_score]
 filter_list = [i*0.1 for i in list(range(1,10))]
-
-# prepare data
-data_herb = pd.read_csv('./plos_reviwer1/ann.csv', encoding='utf-8')
-data_herb.name = 'Herb'
-data_herb_filter = pd.read_csv('./plos_reviwer1/herb_filter.csv', encoding='utf-8')
-data_herb_filter.name = 'Herb_filter'
-data_compound = pd.read_csv('./plos_reviwer1/compound.csv', encoding='utf-8')
-data_compound.name = ['Compound']
-dataset_list = [data_herb,data_herb_filter, data_compound ]
-
 result_all_level = model_result_levels(dataset_list)
+
