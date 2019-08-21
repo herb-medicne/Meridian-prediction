@@ -4,10 +4,6 @@
 # @File    : deep_learning_test.py
 # @Software: PyCharm
 
-# Import pandas
-# first, use anaconda command console,
-#activate tenserflow
-
 import glob
 import scipy.misc
 import tensorflow as tf
