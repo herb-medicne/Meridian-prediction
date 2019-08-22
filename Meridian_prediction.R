@@ -30,6 +30,7 @@ uniquedata2 <- uniquedata2[, which(a != 0)]
 ## 2.training the model function
 meridian1 <- function(data, organ, seednumber, methods)
 {
+  
   # 2.1 prepare testing dataset and training dataset
   datanames <- names(data)
   data <- as.data.frame(data)
@@ -42,12 +43,19 @@ meridian1 <- function(data, organ, seednumber, methods)
   trainingclass <- factor(trainingclass)
   testingclass <- databin[-intrain, ][, 1]
   testingclass <- factor(testingclass)
-  
+  levels(trainingclass)=c('zero','one')
+  testingclass=factor(testingclass)
+  levels(testingclass)=c('zero','one')
   # 2.2 train model
   set.seed(3333)
-  trctrl <- trainControl(method = "cv", number = 5)
+  print(paste(names(organ), datanames, methods, 
+                               sep = "_"))
+  trctrl <- trainControl(method = "cv", number = 5,classProbs =  TRUE)
   model_fit <- train(training, trainingclass, method = methods, trControl = trctrl, 
-                     metric = "Accuracy")
+                     metric = "Accuracy",MaxNWts = 20000)
+  filename_model <- paste(names(organ), datanames, methods, "model.rds", 
+                               sep = "_")
+  saveRDS(model_fit, filename_model)
   
   # 2.3 feature importance score calculate
   importance <- varImp(model_fit, scale = FALSE)
@@ -59,18 +67,21 @@ meridian1 <- function(data, organ, seednumber, methods)
   
   # 2.5 predict the testing data
   modelPredict <- predict(model_fit, newdata = testing)
+  modelPredict_auc <- predict(model_fit, newdata = testing, type="prob")
   
   # 2.6 evaluate the prediction
-  a <- confusionMatrix(modelPredict, testingclass, positive = "1")
+  a <- confusionMatrix(modelPredict, testingclass, positive = "one")
+  result.roc <- roc(testingclass, modelPredict_auc$zero)
+  auc <- result.roc$auc
   
   # 2.7 save main evaluate value to dataframe
   tocsv <- data.frame(cbind(t(a$overall), t(a$byClass)))
+  tocsv$auc = auc
   k <- c(seednumber, datanames, methods, names(organ))
   names(k) <- c("seed", "Feature_type", "Method", "Meridians")
   tocsv1 <- data.frame(cbind(t(k), tocsv))
   return(tocsv1)
 }
-
 
 ## 3. loop different methods function
 meridian2 <- function(data, organ, seednumber, methodlist)
@@ -177,7 +188,7 @@ STOMACH[STOMACH > 1] <- "1"
 datalistall <- list(ADME = as.data.frame(ADME), PubChem = as.data.frame(PubChem), 
                     MACCS = as.data.frame(MACCS), Sub = (Sub), Ext = as.data.frame(Ext), 
                     ADME_Ext = as.data.frame(ADME_Ext), ADME_all = as.data.frame(ADME_all))
-methodlistall <- c("knn", "rf", "svmLinear", "rpart")
+methodlistall <- c("knn", "rf", "svmLinear", "rpart",  "nnet")
 organlistall <- list(LUNG, SPLEEN, STOMACH, HEART, KIDNEY, LARGE.INTESTINE, 
                      LIVER)
 
