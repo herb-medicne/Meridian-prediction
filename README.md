@@ -17,6 +17,7 @@ There are five parameters needed when running the scrip.
     •	2 = 'rf'
     •	3 = 'svmLinear'
     •	4 = ‘rpart’
+    •	5 = ‘nnet’
     
 #### 1.2 ‘d’ ( Features we use )
 
