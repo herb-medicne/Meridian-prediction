@@ -6,6 +6,9 @@
 
 import glob
 import scipy.misc
+#import matplotlib
+#%matplotlib inline
+#import matplotlib.pyplot as plt
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -14,23 +17,24 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from keras.models import Sequential
 from keras.layers import Dense
+from keras.layers import Dropout
 from sklearn.preprocessing import Binarizer
 from sklearn.metrics import classification_report,accuracy_score,confusion_matrix, \
     precision_score, recall_score, f1_score, cohen_kappa_score,roc_auc_score
 import math
 import os
 
-# process the data to train and split
 def get_data(X,y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=3333)
     scaler = StandardScaler().fit(X_train)
     X_train = scaler.transform(X_train)
     X_test = scaler.transform(X_test)
     return X_train, X_test, y_train, y_test
 
-# read the whole dataset to different kind of feature
 def get_datasets(data):
     y= np.array(data.loc[:,['LUNG','SPLEEN','STOMACH','HEART','KIDNEY','LIVER','LARGE INTESTINE']])
+    binarizer = Binarizer(0.5).fit(y)
+    y_binary = binarizer.transform(y)
     X_ADME = data.loc[:,'MW':'Synthetic Accessibility']
     X_ADME.name = 'ADME'
     X_Ext = data.loc[:,data.columns.str.startswith('ExtFP')]
@@ -47,23 +51,27 @@ def get_datasets(data):
     X = data.loc[:, 'MW':'SubFP307']
     X.name = 'ADME_all'
     X_list = [X_ADME, X_Ext, X_Pubchem, X_Sub, X_MACCS, X_ADME_Ext, X]
-    return X_list, y
+    return X_list, y_binary
 
-# model 
+# model
 def get_model(X_train,y_train):
     x_shape = len(X_train[1])
     dense_shape = int(math.log(x_shape, 2))
     nn = Sequential()
     nn.add(Dense(dense_shape, activation="relu", input_shape=(x_shape,)))
+    nn.add(Dropout(0.2))
+
+    nn.add(Dense(dense_shape, activation="relu"))
+    nn.add(Dropout(0.2))
+
     nn.add(Dense(7, activation="sigmoid"))
     nn.compile(optimizer='adam', loss='binary_crossentropy',
      metrics=['accuracy'])
     nn.fit(X_train, y_train,
-           batch_size=16,
+           batch_size=4,
            epochs=5,
            verbose=1,
            validation_split=0.1)
-
     return nn
 
 # predict
@@ -73,6 +81,7 @@ def predict(nn,X_test,y_test):
     true = pd.DataFrame(y_test, columns = meridian_names)
     result = pd.DataFrame(result_pre, columns = meridian_names)
     return true,result
+
 
 # evaluate
 def evalate(threshhold,meridian,result_data,true_data ):
@@ -99,13 +108,12 @@ def meridan_result (threshhold,meridian_names,result_data,true_data):
     pd_result.columns = pd_add_column_in
     return pd_result
 
-#use different probality value as the threshhold of positive and negative to binary the predictors
 def filter_result (filter_list,meridian_names,result_data,true_data):
     pd_result = pd.concat(list(map( lambda x: meridan_result(x,meridian_names,result_data,true_data),
                                     filter_list)),keys=filter_list)
     return pd_result
 
-# try different data at three level, herb, herb_adme_filter, compound
+# try different data
 def get_model_result_one(X,y):
     X_train, X_test, y_train, y_test = get_data(np.array(X),y)
     nn = get_model(X_train, y_train)
@@ -113,27 +121,19 @@ def get_model_result_one(X,y):
     all_result = filter_result(filter_list,meridian_names,result,true)
     return all_result
 
-#combine all predict evaluation
-def get_model_result_all(X_list, y):
+def get_model_result_all(data):
+    X_list,y = get_datasets(data)
     pd_result_all = pd.concat(list(map( lambda x: get_model_result_one(x,y),X_list)),
                               keys= [i.name for i in X_list],axis=0,ignore_index=False)
     return pd_result_all
 
+
 def model_result_levels(dataset_list):
-    pd_all_all = pd.concat(list(map( lambda x:get_model_result_all(get_datasets(x)[0],get_datasets(x)[1]),dataset_list)),
-                               keys=[i.name for i in dataset_list], axis=0,sort=True, ignore_index=True)
+    pd_all_all = pd.concat(list(map( lambda x:get_model_result_all(x),dataset_list)),
+                               keys=[i.name for i in dataset_list], axis=0,sort=True, ignore_index=False)
     return pd_all_all
 
-# read the data for this project and prepare data
-data_herb = pd.read_csv('herb.csv', encoding='utf-8')
-data_herb.name = 'Herb'
-data_herb_filter = pd.read_csv('herb_filter.csv', encoding='utf-8')
-data_herb_filter.name = 'Herb_filter'
-data_compound = pd.read_csv('compound.csv', encoding='utf-8')
-data_compound.name = ['Compound']
-dataset_list = [data_herb,data_herb_filter, data_compound ]
-
-# set the parameters
+# apply on my project
 meridian_names = ['LUNG','SPLEEN','STOMACH','HEART','KIDNEY','LIVER','LARGE INTESTINE']
 list_of_functions = [confusion_matrix,
                      accuracy_score,
@@ -142,5 +142,21 @@ list_of_functions = [confusion_matrix,
                      recall_score,
                      cohen_kappa_score]
 filter_list = [i*0.1 for i in list(range(1,10))]
+
+# prepare data
+data_herb = pd.read_csv('herb_before.csv', encoding='utf-8')
+data_herb.name = 'Herb'
+data_herb_filter = pd.read_csv('herb_filter.csv', encoding='utf-8')
+data_herb_filter.name = 'Herb_filter'
+data_compound = pd.read_csv('compound.csv', encoding='utf-8')
+data_compound = data_compound.dropna()
+data_compound.name = 'Compound'
+dataset_list = [data_herb,data_herb_filter, data_compound ]
+
 result_all_level = model_result_levels(dataset_list)
+herb = get_model_result_all(data_herb)
+herb_filter = get_model_result_all(data_herb_filter)
+compound_level = get_model_result_all(data_compound)
+pd_all_all_seed = pd.concat([herb,herb_filter,compound_level],keys=[i.name for i in dataset_list], axis=0,sort=True, ignore_index=False)
+pd_all_all_seed.to_csv('all_result_multi_label.csv')
 
