@@ -17,7 +17,6 @@ There are five parameters needed when running the scrip.
     •	2 = 'rf'
     •	3 = 'svmLinear'
     •	4 = ‘rpart’
-    •	5 = ‘nnet’
     
 #### 1.2 ‘d’ ( Features we use )
 
@@ -65,9 +64,9 @@ This is compound level of Meridian classification and features. As the file is t
 
 Firstly, decide which kind of model result you want to get. Then, give the corresponding number to five parameters. For example, here I use these parameter setting:
 
-    •	m='c(1,3)'
-    •	d='c(1,2)'
-    •	o='c(3,4)'
+    •	m=13
+    •	d=12
+    •	o=34
     •	f='model_prediction_result_output.csv'
     •	i=1
     
