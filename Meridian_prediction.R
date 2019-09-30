@@ -11,6 +11,8 @@ library(nycflights13)
 library(car)
 library(mlbench)
 library("randomForest")
+library(precrec)
+library(plyr)
 
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -18,8 +20,11 @@ args <- commandArgs(trailingOnly = TRUE)
 
 inputfilename_list <- c("herb_feature.csv", "herb_feature_adme_filter.csv", 
                         "compound_feature.csv")
+inputfilename_list_fill <- c("Herb_before_filtering", "Herb_after_filtering", 
+                        "Compound")
+filename <- inputfilename_list[as.numeric(args[1])]
+Level <- inputfilename_list_fill[as.numeric(args[1])]
 
-filename <- inputfilename_list[as.numeric(args[5])]
 mydata <- read.csv(filename)
 mydata <- select(mydata, "LUNG":"SubFP307")
 uniquedata2 <- uniquecombs(mydata)
@@ -28,9 +33,8 @@ a <- colSums(uniquedata2)
 uniquedata2 <- uniquedata2[, which(a != 0)]
 
 ## 2.training the model function
-meridian1 <- function(data, organ, seednumber, methods)
+meridian1 <- function(data, organ, seednumber, methods,Level)
 {
-  
   # 2.1 prepare testing dataset and training dataset
   datanames <- names(data)
   data <- as.data.frame(data)
@@ -43,53 +47,67 @@ meridian1 <- function(data, organ, seednumber, methods)
   trainingclass <- factor(trainingclass)
   testingclass <- databin[-intrain, ][, 1]
   testingclass <- factor(testingclass)
+  
+  # for auc
   levels(trainingclass)=c('zero','one')
-  testingclass=factor(testingclass)
   levels(testingclass)=c('zero','one')
+  
   # 2.2 train model
   set.seed(3333)
-  print(paste(names(organ), datanames, methods, 
-                               sep = "_"))
-  trctrl <- trainControl(method = "cv", number = 5,classProbs =  TRUE)
+  if (methods=="svmLinear"){
+    trctrl <- trainControl(method = "cv", number = 5,classProbs =  TRUE)
+    
+  }else{
+    trctrl <- trainControl(method = "cv", number = 5)
+  }
   model_fit <- train(training, trainingclass, method = methods, trControl = trctrl, 
-                     metric = "Accuracy",MaxNWts = 20000)
-  filename_model <- paste(names(organ), datanames, methods, "model.rds", 
-                               sep = "_")
-  saveRDS(model_fit, filename_model)
+                     metric = "Accuracy")
+  parametertest=model_fit$results
+  
+  filename_paragrid=paste('./parameter_result/',Level,as.character(seednumber),names(organ),datanames,methods,'para.csv',sep='_')
+  write.csv(parametertest,file= filename_paragrid)
+  
+  filename_model=paste('./RDS_result/',Level,as.character(seednumber),names(organ),datanames,methods,'model.rds',sep='_')
+  saveRDS(model_fit,  filename_model)
   
   # 2.3 feature importance score calculate
   importance <- varImp(model_fit, scale = FALSE)
   
   # 2.4 output importance score
-  filename_import_csv <- paste(names(organ), datanames, methods, "import.csv", 
+  filename_import_csv <- paste('./import_feature_result/',Level,as.character(seednumber),names(organ), datanames, methods, "import.csv", 
                                sep = "_")
   write.csv(importance$importance, file = filename_import_csv)
   
   # 2.5 predict the testing data
   modelPredict <- predict(model_fit, newdata = testing)
-  modelPredict_auc <- predict(model_fit, newdata = testing, type="prob")
+  
+  modelPredict_auc = predict(model_fit, newdata = testing,type="prob")
   
   # 2.6 evaluate the prediction
   a <- confusionMatrix(modelPredict, testingclass, positive = "one")
-  result.roc <- roc(testingclass, modelPredict_auc$zero)
-  auc <- result.roc$auc
   
-  # 2.7 save main evaluate value to dataframe
+  curve = evalmod(scores = modelPredict_auc$one, labels = testingclass)
+  ROC = auc(curve)$aucs[1] # ROC
+  PR = auc(curve)$aucs[2] # PRC
+  result_base_pr = length(testingclass[which(testingclass=='one')])/length(testingclass)
+  PR_rate = PR/result_base_pr
+ 
+   # 2.7 save main evaluate value to dataframe
   tocsv <- data.frame(cbind(t(a$overall), t(a$byClass)))
-  tocsv$auc = auc
-  k <- c(seednumber, datanames, methods, names(organ))
-  names(k) <- c("seed", "Feature_type", "Method", "Meridians")
+  k <- c(Level,seednumber, datanames, methods, names(organ), ROC,PR,result_base_pr,PR_rate)
+  names(k) <- c('Level',"seed", "Feature_type", "Method", "Meridians",'AUROC','AUPRC','AUPRC_base','AUPRC_rate')
   tocsv1 <- data.frame(cbind(t(k), tocsv))
   return(tocsv1)
 }
 
+
 ## 3. loop different methods function
-meridian2 <- function(data, organ, seednumber, methodlist)
+meridian2 <- function(data, organ, seednumber, methodlist, Level)
 {
   m1 <- data.frame()
   for (methods in methodlist)
   {
-    m <- meridian1(data, organ, seednumber, methods)
+    m <- meridian1(data, organ, seednumber, methods, Level)
     m1 <- data.frame(rbind(m1, m))
   }
   return(m1)
@@ -98,12 +116,12 @@ meridian2 <- function(data, organ, seednumber, methodlist)
 
 ## 4. loop different meridian function
 
-meridian3 <- function(data, organlist, seednumber, methodlist)
+meridian3 <- function(data, organlist, seednumber, methodlist,Level)
 {
   r1 <- data.frame()
   for (organs in organlist)
   {
-    r <- meridian2(data, organs, seednumber, methodlist)
+    r <- meridian2(data, organs, seednumber, methodlist,Level)
     r1 <- data.frame(rbind(r1, r))
   }
   return(r1)
@@ -111,12 +129,12 @@ meridian3 <- function(data, organlist, seednumber, methodlist)
 
 
 ## 5. loop different seeds function
-meridian4 <- function(data, organlist, seedlist, methodlist)
+meridian4 <- function(data, organlist, seedlist, methodlist,Level)
 {
   s1 <- data.frame()
   for (seeds in seedlist)
   {
-    s <- meridian3(data, organlist, seeds, methodlist)
+    s <- meridian3(data, organlist, seeds, methodlist,Level)
     s1 <- data.frame(rbind(s1, s))
   }
   return(s1)
@@ -124,17 +142,18 @@ meridian4 <- function(data, organlist, seedlist, methodlist)
 
 
 ## 6. loop different features function
-meridian5 <- function(datalist, organlist, seedlist, methodlist, filename_pre_csv = "")
+meridian5 <- function(datalist, organlist, seedlist, methodlist, filename_pre_csv = "",Level)
 {
   d1 <- data.frame()
   for (i in 1:length(datalist))
   {
     datas <- datalist[i]
     names(datas) <- names(datalist[i])
-    d <- meridian4(datas, organlist, seedlist, methodlist)
+    d <- meridian4(datas, organlist, seedlist, methodlist,Level)
     d1 <- data.frame(rbind(d1, d))
   }
-  write.csv(d1, file = filename_pre_csv)
+  filename_pre_csv_path = paste0('./evaluate_result/',filename_pre_csv)
+  write.csv(d1, file = filename_pre_csv_path)
   return(d1)
 }
 
@@ -186,18 +205,19 @@ STOMACH[STOMACH > 1] <- "1"
 
 # 10. generate lists of all the seven features, seven meridians and four machining learning methods
 datalistall <- list(ADME = as.data.frame(ADME), PubChem = as.data.frame(PubChem), 
-                    MACCS = as.data.frame(MACCS), Sub = (Sub), Ext = as.data.frame(Ext), 
+                    MACCS = as.data.frame(MACCS), Sub = as.data.frame(Sub), Ext = as.data.frame(Ext), 
                     ADME_Ext = as.data.frame(ADME_Ext), ADME_all = as.data.frame(ADME_all))
-methodlistall <- c("knn", "rf", "svmLinear", "rpart",  "nnet")
+methodlistall <- c("knn", "rf", "svmLinear", "rpart")
 organlistall <- list(LUNG, SPLEEN, STOMACH, HEART, KIDNEY, LARGE.INTESTINE, 
                      LIVER)
 
 # 11. receive arguments
-methodlist <- methodlistall[as.vector(eval(parse(text = args[1])))]
-datalist <- datalistall[as.vector(eval(parse(text = args[2])))]
+methodlist <- methodlistall[as.numeric(strsplit(args[2],split = '')[[1]])]
+datalist <- datalistall[as.numeric(strsplit(args[3],split = '')[[1]])]
 seedlist <- c(3333)
-organlist <- organlistall[as.vector(eval(parse(text = args[3])))]
-filename_pre_csv <- args[4]
+organlist <- organlistall[as.numeric(strsplit(args[4],split = '')[[1]])]
+filename_pre_csv <- args[5]
 
 # 12. run the final function get predict value
-meridian5(datalist, organlist, seedlist, methodlist, filename_pre_csv)
+meridian5(datalist, organlist, seedlist, methodlist, filename_pre_csv,Level)
+
