@@ -143,6 +143,7 @@ list_of_functions = [confusion_matrix,
                      cohen_kappa_score]
 filter_list = [i*0.1 for i in list(range(1,10))]
 
+
 # prepare data
 data_herb = pd.read_csv('herb_before.csv', encoding='utf-8')
 data_herb.name = 'Herb'
